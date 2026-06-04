@@ -53,6 +53,11 @@ def _get_csv(uploaded):
     cache = st.session_state.get("_csv_cache")
     if cache and cache["file_id"] == file_id:
         return cache["path"], cache["df"]
+    if cache:  # 다른 파일로 바뀜 → 이전 임시파일 정리(누수 방지)
+        try:
+            os.remove(cache["path"])
+        except OSError:
+            pass
     path = _save_upload(uploaded)
     df = pd.read_csv(path)
     st.session_state["_csv_cache"] = {"file_id": file_id, "path": path, "df": df}
